@@ -113,3 +113,6 @@ class GateAPIClient():
 
 client = GateAPIClient()
 client.trade('BTC_USDT')
+
+wsclient = GateWSClient()
+wsclient.trade()
