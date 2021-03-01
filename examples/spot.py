@@ -7,7 +7,7 @@ from six.moves.urllib.parse import urlparse
 import yaml
 import os
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 class RunConfig(object):
 
@@ -38,7 +38,7 @@ def spot_demo(run_config):
     config = Configuration(key=run_config.api_key, secret=run_config.api_secret, host=run_config.host_used)
     spot_api = SpotApi(ApiClient(config))
     pair = spot_api.get_currency_pair(currency_pair)
-    logger.info("testing against currency pair: " + currency_pair)
+    # logger.info("testing against currency pair: " + currency_pair)
     min_amount = pair.min_quote_amount
 
     # get last price
@@ -51,9 +51,11 @@ def spot_demo(run_config):
     accounts = spot_api.list_spot_accounts(currency=currency)
     assert len(accounts) == 1
     available = D(accounts[0].available)
-    logger.info("Account available: %s %s", str(available), currency)
+    # logger.info("Account available: %s %s", str(available), currency)
+    print(f'Account available: {str(available)} {currency}')
     if available < order_amount:
-        logger.error("Account balance not enough")
+        #logger.error("Account balance not enough")
+        print(f'Account balance not enough')
         return
 """
     order = Order(amount=str(order_amount), price=last_price, side='buy', currency_pair=currency_pair)
@@ -74,4 +76,5 @@ def spot_demo(run_config):
             logger.info("order %s filled %s with price %s", t.order_id, t.amount, t.price)"""
 
 config = RunConfig()
+config.loadConfig()
 spot_demo(config)
