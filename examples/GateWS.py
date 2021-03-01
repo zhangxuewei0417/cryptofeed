@@ -3,6 +3,7 @@
 import random
 
 from websocket import create_connection
+from websocket import WebSocketTimeoutException
 import gzip
 import time
 import json
@@ -58,9 +59,14 @@ class GateWs:
         if method == "server.sign":
             return
         else:
-            data = {'id': id, 'method': method, 'params': params}
-            js = json.dumps(data)
-            GateWs.ws.send(js)
-            return GateWs.ws.recv()
+            try:
+                data = {'id': id, 'method': method, 'params': params}
+                js = json.dumps(data)
+                GateWs.ws.send(js)
+            except WebSocketTimeoutException:
+                self.gateSign()
+            finally:
+                GateWs.ws.send(js)
+                return GateWs.ws.recv()
 
 ####https://www.gateio.io/####

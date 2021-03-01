@@ -190,3 +190,6 @@ class GateAPIClient():
 
 wsclient = GateWSClient()
 wsclient.trade()
+
+wsclient = GateWSClient()
+wsclient.trade()
