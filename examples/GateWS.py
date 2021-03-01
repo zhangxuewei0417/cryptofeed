@@ -11,8 +11,8 @@ import hashlib
 
 
 def get_sign(secret_key, message):
-    h = (base64.b64encode(hmac.new(secret_key.encode('utf-8'), message.encode('utf-8'), hashlib.sha512).digest())).decode()
-    #h = hmac.new(secret_key, message, hashlib.sha512).hexdigest()
+    #h = (base64.b64encode(hmac.new(secret_key.encode('utf-8'), message.encode('utf-8'), hashlib.sha512).digest())).decode()
+    h = hmac.new(secret_key.encode('utf-8'), message.encode('utf-8'), hashlib.sha512).hexdigest()
     return h
 
 
