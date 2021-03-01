@@ -74,4 +74,5 @@ def spot_demo(run_config):
             logger.info("order %s filled %s with price %s", t.order_id, t.amount, t.price)"""
 
 config = RunConfig()
+config.loadConfig()
 spot_demo(config)
