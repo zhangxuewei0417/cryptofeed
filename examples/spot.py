@@ -1,56 +1,69 @@
 # !/usr/bin/env python
 # coding: utf-8
 import logging
+import threading
 from decimal import Decimal as D
 from gate_api import ApiClient, Configuration, Order, SpotApi
 from six.moves.urllib.parse import urlparse
 import yaml
 import os
-
+from examples.GateWS import GateWs
+import random
 # logger = logging.getLogger(__name__)
 
-"""class RunConfig(object):
 
-    def __init__(self, api_key=None, api_secret=None, host_used=None, load_config=True):
-        # type: (str, str, str) -> None
-        self.api_key = api_key
-        self.api_secret = api_secret
-        self.host_used = host_used
-
-        if load_config:
-            self.loadConfig()
-        # self.use_test = urlparse(host_used).hostname == "fx-api-testnet.gateio.ws"
-
-    def loadConfig(self):
-        filename = os.path.join(os.path.dirname(__file__), 'config.yaml').replace("\\", "/")
-        f = open(filename)
-
-        gateio_config = yaml.load(f)
-        self.api_key = gateio_config['api_key']
-        self.api_secret = gateio_config['api_secret']
-        self.host_used = gateio_config['host_used']"""
-
-
-class Spot():
+class GateioConfig():
+    _instance_lock = threading.Lock()
+    configLoaded = False
+    config_dict = {}
 
     def __init__(self):
-        # self.run_config = RunConfig()
-        self.api_key = None
-        self.api_secret = None
-        self.host_used = None
+        pass
 
-        self.loadConfig()
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(GateioConfig, "_instance"):
+            with GateioConfig._instance_lock:
+                if not hasattr(GateioConfig, "_instance"):
+                    GateioConfig._instance = object.__new__(cls)
+        return GateioConfig._instance
+
+    @property
+    def getConfig(self):
+        if not GateioConfig.configLoaded:
+            with GateioConfig._instance_lock:
+                self.loadConfig()
+        return GateioConfig.config_dict
 
     def loadConfig(self):
         filename = os.path.join(os.path.dirname(__file__), 'config.yaml').replace("\\", "/")
         f = open(filename)
 
         gateio_config = yaml.load(f)
-        self.api_key = gateio_config['api_key']
-        self.api_secret = gateio_config['api_secret']
-        self.host_used = gateio_config['host_used']
+        GateioConfig.config_dict = {'api_key': gateio_config['api_key'],
+                       'api_secret': gateio_config['api_secret'],
+                       'host_used': gateio_config['host_used']}
+        GateioConfig.configLoaded = True
 
-    def spot_demo(self, currency_pair):
+
+class GateWSClient():
+    def __init__(self):
+        self.gateio_config = GateioConfig()
+        self.api_key = self.gateio_config.api_key
+        self.api_secret = self.gateio_config.api_secret
+
+    def trade(self):
+        gate = GateWs("wss://ws.gate.io/v3/", "your key", "your secret.")
+
+
+class GateAPIClient():
+    def __init__(self):
+        gateio_obj = GateioConfig()
+
+        self.api_key = gateio_obj.getConfig['api_key']
+        self.api_secret = gateio_obj.getConfig['api_secret']
+        self.host_used = gateio_obj.getConfig['host_used']
+
+    def trade(self, currency_pair):
         # type: (RunConfig) -> None
         # currency_pair = "BTC_USDT"
         currency = currency_pair.split("_")[1]
@@ -97,5 +110,5 @@ class Spot():
             for t in trades:
                 logger.info("order %s filled %s with price %s", t.order_id, t.amount, t.price)"""
 
-spot = Spot()
-spot.spot_demo('BTC_USDT')
+client = GateAPIClient()
+client.trade('BTC_USDT')
