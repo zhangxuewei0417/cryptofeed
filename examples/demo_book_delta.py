@@ -82,7 +82,7 @@ def main():
     f.add_feed(EXX(max_depth=25, book_interval=100, symbols=['BTC-USDT'], channels=[L2_BOOK], callbacks=DeltaBook("EXX").L2))
     f.add_feed(Gemini(max_depth=20, book_interval=100, symbols=['BTC-USD'], channels=[L2_BOOK], callbacks=DeltaBook("Gemini").L2))
     f.add_feed(HitBTC(max_depth=10, book_interval=100, symbols=['BTC-USD'], channels=[L2_BOOK], callbacks=DeltaBook("HitBTC").L2))
-    f.add_feed(Poloniex(max_depth=10, book_interval=100, symbols=['BTC-USDT'], channels=[L2_BOOK], callbacks=DeltaBook("Poloniex").L2))
+    # f.add_feed(Poloniex(max_depth=10, book_interval=100, symbols=['BTC-USDT'], channels=[L2_BOOK], callbacks=DeltaBook("Poloniex").L2))
     f.add_feed(Kraken(max_depth=10, book_interval=100, symbols=['BTC-USD'], channels=[L2_BOOK], callbacks=DeltaBook("Kraken").L2))
     f.add_feed(OKCoin(max_depth=100, book_interval=100, symbols=['BTC-USD'], channels=[L2_BOOK], callbacks=DeltaBook("OKCoin").L2))
     f.add_feed(Bybit(max_depth=100, book_interval=100, symbols=['BTC-USD'], channels=[L2_BOOK], callbacks=DeltaBook("Bybit").L2))
