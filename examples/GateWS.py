@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # author: か壞尐孩キ
 
-import websocket
+from websocket import create_connection
 import gzip
 import time
 import json
@@ -25,18 +25,14 @@ class GateWs:
     def gateGet(self, id, method, params):
         if (params == None):
             params = []
-        #ws = create_connection(self.__url)
-        ws = websocket.WebSocket()
-        ws.connect(self.__url)
+        ws = create_connection(self.__url)
         data = {'id': id, 'method': method, 'params': params}
         js = json.dumps(data)
         ws.send(js)
         return ws.recv()
 
     def gateRequest(self, id, method, params):
-        # ws = create_connection(self.__url)
-        ws = websocket.WebSocket()
-        ws.connect(self.__url)
+        ws = create_connection(self.__url)
         nonce = int(time.time() * 1000)
         signature = get_sign(self.__secretKey, str(nonce))
         data = {'id': id, 'method': 'server.sign', 'params': [self.__apiKey, signature, nonce]}
