@@ -54,7 +54,7 @@ class GateWSClient():
         self.host_used = gateio_obj.getConfig['host_used']
 
     def trade(self):
-        gate = GateWs("wss://ws.gate.io/v3/", self.api_key, self.api_secret)
+        gate = GateWs("wss://ws.gate.io/v4/", self.api_key, self.api_secret)
         ##Check server connectivity.
         # print(gate.gateRequest(random.randint(0,99999),'server.ping',[]))
 
