@@ -47,12 +47,14 @@ class GateioConfig():
 
 class GateWSClient():
     def __init__(self):
-        self.gateio_config = GateioConfig()
-        self.api_key = self.gateio_config.api_key
-        self.api_secret = self.gateio_config.api_secret
+        gateio_obj = GateioConfig()
+
+        self.api_key = gateio_obj.getConfig['api_key']
+        self.api_secret = gateio_obj.getConfig['api_secret']
+        self.host_used = gateio_obj.getConfig['host_used']
 
     def trade(self):
-        gate = GateWs("wss://ws.gate.io/v3/", "your key", "your secret.")
+        gate = GateWs("wss://ws.gate.io/v3/", self.api_key, self.api_secret)
         print(gate.gateRequest(random.randint(0, 99999), 'server.ping', []))
 
 
