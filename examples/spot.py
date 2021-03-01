@@ -53,6 +53,7 @@ class GateWSClient():
 
     def trade(self):
         gate = GateWs("wss://ws.gate.io/v3/", "your key", "your secret.")
+        print(gate.gateRequest(random.randint(0, 99999), 'server.ping', []))
 
 
 class GateAPIClient():
