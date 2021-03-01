@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # author: か壞尐孩キ
+import random
 
 from websocket import create_connection
 import gzip
@@ -34,22 +35,25 @@ class GateWs:
         ws.send(js)
         return ws.recv()
 
-    def gateSign(self, id, method, params):
+    def gateSign(self):
 
         if GateWs.ws is None:
             GateWs.ws = create_connection(self.__url)
         nonce = int(time.time() * 1000)
         signature = get_sign(self.__secretKey, str(nonce))
-        data = {'id': id, 'method': 'server.sign', 'params': [self.__apiKey, signature, nonce]}
+        data = {'id': random.randint(0, 99999), 'method': 'server.sign', 'params': [self.__apiKey, signature, nonce]}
         js = json.dumps(data)
         GateWs.ws.send(js)
         GateWs.server_signed = True
-        return GateWs.ws.recv()
+        return print(GateWs.ws.recv())
 
     def gateRequest(self, id, method, params):
 
         if GateWs.ws is None:
             GateWs.ws = create_connection(self.__url)
+
+        if GateWs.server_signed is False:
+            self.gateSign()
 
         if method == "server.sign":
             return
