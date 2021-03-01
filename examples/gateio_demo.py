@@ -25,6 +25,7 @@ from cryptofeed.exchanges import (FTX, Binance, BinanceFutures, Bitfinex, Bitfly
 # while the callbacks are being handled (unless they in turn await other functions or I/O)
 # so they should be as lightweight as possible
 from examples.arbitrage import Arbitrage
+import time
 
 g_dict = {}
 g = nx.DiGraph()
