@@ -102,7 +102,7 @@ class GateWSClient():
         # print(gate.gateRequest(random.randint(0,99999),'kline.update',[1492358400,"7000.00","8000.0","8100.00","6800.00","1000.00","123456.00","BTC_USDT"]))
 
         ##Signature based authorization.
-        print(gate.gateRequest(random.randint(0,99999),'server.sign',[]))
+        print(gate.gateSign(random.randint(0,99999),'server.sign',[]))
 
         ##Query user unexecuted orders
         # print(gate.gateRequest(random.randint(0,99999),'order.query',["BTC_USDT",0,10]))
@@ -129,11 +129,6 @@ class GateWSClient():
 
         ##Unsubscribe user balance update.
         ##print(gate.gateRequest(random.randint(0,99999),'balance.unsubscribe',[]))
-        loop = asyncio.get_event_loop()
-        coros = [(gate.gateRequest(random.randint(0,99999),'balance.query',["BTC"])),
-                                 (gate.gateRequest(random.randint(0, 99999), 'balance.query', ["USDT"])),
-                                 (gate.gateRequest(random.randint(0, 99999), 'balance.query', ["ETH"]))]
-        loop.run_until_complete(asyncio.gather(*coros))
 
 class GateAPIClient():
     def __init__(self):

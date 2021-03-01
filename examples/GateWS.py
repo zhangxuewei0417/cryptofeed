@@ -2,7 +2,6 @@
 # author: か壞尐孩キ
 
 from websocket import create_connection
-import websockets
 import gzip
 import time
 import json
@@ -18,6 +17,9 @@ def get_sign(secret_key, message):
 
 
 class GateWs:
+    ws = None
+    server_signed = False
+
     def __init__(self, url, apiKey, secretKey):
         self.__url = url
         self.__apiKey = apiKey
@@ -32,38 +34,29 @@ class GateWs:
         ws.send(js)
         return ws.recv()
 
-    async def gateRequest(self, id, method, params):
-        ws = create_connection(self.__url)
-        async with websockets.connect(self.__url) as ws:
-            nonce = int(time.time() * 1000)
-            signature = get_sign(self.__secretKey, str(nonce))
-            data = {'id': id, 'method': 'server.sign', 'params': [self.__apiKey, signature, nonce]}
-            js = json.dumps(data)
-            await ws.send(js)
-            if method == "server.sign":
-                return ws.recv()
-            else:
-                await ws.recv()
-                data = {'id': id, 'method': method, 'params': params}
-                js = json.dumps(data)
-                await ws.send(js)
-                return ws.recv()
+    def gateSign(self, id, method, params):
 
-
-"""    def gateRequest(self, id, method, params):
-        ws = create_connection(self.__url)
+        if GateWs.ws is None:
+            GateWs.ws = create_connection(self.__url)
         nonce = int(time.time() * 1000)
         signature = get_sign(self.__secretKey, str(nonce))
         data = {'id': id, 'method': 'server.sign', 'params': [self.__apiKey, signature, nonce]}
         js = json.dumps(data)
-        await ws.send(js)
+        GateWs.ws.send(js)
+        GateWs.server_signed = True
+        return GateWs.ws.recv()
+
+    def gateRequest(self, id, method, params):
+
+        if GateWs.ws is None:
+            GateWs.ws = create_connection(self.__url)
+
         if method == "server.sign":
-            return ws.recv()
+            return
         else:
-            await ws.recv()
             data = {'id': id, 'method': method, 'params': params}
             js = json.dumps(data)
-            await ws.send(js)
-            return ws.recv()"""
+            GateWs.ws.send(js)
+            return GateWs.ws.recv()
 
 ####https://www.gateio.io/####
