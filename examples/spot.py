@@ -54,7 +54,7 @@ class GateWSClient():
         self.host_used = gateio_obj.getConfig['host_used']
 
     def trade(self):
-        gate = GateWs("wss://ws.gate.io/v3/", self.api_key, self.api_secret)
+        gate = GateWs("wss://ws.gate.io/v4/", self.api_key, self.api_secret)
         ##Check server connectivity.
         # print(gate.gateRequest(random.randint(0,99999),'server.ping',[]))
 
@@ -101,7 +101,7 @@ class GateWSClient():
         # print(gate.gateRequest(random.randint(0,99999),'kline.update',[1492358400,"7000.00","8000.0","8100.00","6800.00","1000.00","123456.00","BTC_USDT"]))
 
         ##Signature based authorization.
-        # print(gate.gateRequest(random.randint(0,99999),'server.sign',[]))
+        print(gate.gateRequest(random.randint(0,99999),'server.sign',[]))
 
         ##Query user unexecuted orders
         # print(gate.gateRequest(random.randint(0,99999),'order.query',["BTC_USDT",0,10]))
