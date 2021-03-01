@@ -2,6 +2,7 @@
 # author: か壞尐孩キ
 
 from websocket import create_connection
+import websockets
 import gzip
 import time
 import json
@@ -33,6 +34,24 @@ class GateWs:
 
     async def gateRequest(self, id, method, params):
         ws = create_connection(self.__url)
+        async with websockets.connect(self.__url) as ws:
+            nonce = int(time.time() * 1000)
+            signature = get_sign(self.__secretKey, str(nonce))
+            data = {'id': id, 'method': 'server.sign', 'params': [self.__apiKey, signature, nonce]}
+            js = json.dumps(data)
+            await ws.send(js)
+            if method == "server.sign":
+                return ws.recv()
+            else:
+                await ws.recv()
+                data = {'id': id, 'method': method, 'params': params}
+                js = json.dumps(data)
+                await ws.send(js)
+                return ws.recv()
+
+
+"""    def gateRequest(self, id, method, params):
+        ws = create_connection(self.__url)
         nonce = int(time.time() * 1000)
         signature = get_sign(self.__secretKey, str(nonce))
         data = {'id': id, 'method': 'server.sign', 'params': [self.__apiKey, signature, nonce]}
@@ -45,6 +64,6 @@ class GateWs:
             data = {'id': id, 'method': method, 'params': params}
             js = json.dumps(data)
             await ws.send(js)
-            return ws.recv()
+            return ws.recv()"""
 
 ####https://www.gateio.io/####

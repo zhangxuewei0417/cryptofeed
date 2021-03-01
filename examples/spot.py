@@ -1,5 +1,6 @@
 # !/usr/bin/env python
 # coding: utf-8
+import asyncio
 import logging
 import threading
 from decimal import Decimal as D
@@ -128,7 +129,11 @@ class GateWSClient():
 
         ##Unsubscribe user balance update.
         ##print(gate.gateRequest(random.randint(0,99999),'balance.unsubscribe',[]))
-
+        loop = asyncio.get_event_loop()
+        coros = [(gate.gateRequest(random.randint(0,99999),'balance.query',["BTC"])),
+                                 (gate.gateRequest(random.randint(0, 99999), 'balance.query', ["USDT"])),
+                                 (gate.gateRequest(random.randint(0, 99999), 'balance.query', ["ETH"]))]
+        loop.run_until_complete(asyncio.gather(*coros))
 
 class GateAPIClient():
     def __init__(self):
