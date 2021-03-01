@@ -7,7 +7,7 @@ from gate_api import ApiClient, Configuration, Order, SpotApi
 from six.moves.urllib.parse import urlparse
 import yaml
 import os
-from examples.GateWS import GateWs
+from GateWS import GateWs
 import random
 # logger = logging.getLogger(__name__)
 
