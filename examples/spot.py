@@ -65,6 +65,11 @@ class GateWSClient():
             balance = res['result'][coin]['available']
         return balance
 
+    def getTicker(self, pair):
+        pair = pair.upper()
+        ws_client = self.getGateWsClient()
+        return ws_client.gateRequest(random.randint(0, 99999), 'ticker.query', [pair, 86400])
+
     def trade(self):
         gate = GateWs("wss://ws.gate.io/v4/", self.api_key, self.api_secret)
         ##Check server connectivity.
@@ -128,9 +133,6 @@ class GateWSClient():
         # print(gate.gateRequest(random.randint(0,99999),'order.unsubscribe',[]))
 
         ##Acquire user balance information of specified asset or assets.
-        print(gate.gateRequest(random.randint(0, 99999), 'balance.query', ["BTC"]))
-        print(gate.gateRequest(random.randint(0, 99999), 'balance.query', ["USDT"]))
-        print(gate.gateRequest(random.randint(0, 99999), 'balance.query', ["ETH"]))
 
         ##Subscribe for user balance update.
         # print(gate.gateRequest(random.randint(0,99999),'balance.subscribe',["BTC"]))
@@ -209,4 +211,5 @@ print(res)
 res = ws_client.getBalanceSimple('dot')
 print(res)
 
+print(ws_client.getTicker('btc_usdt'))
 
