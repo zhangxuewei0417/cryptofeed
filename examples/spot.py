@@ -62,8 +62,6 @@ class GateWSClient():
                 GateWSClient.gate_ws_client = GateWs("wss://ws.gate.io/v4/", api_key, api_secret)
         return GateWSClient.gate_ws_client
 
-    def __init__(self):
-
     def getBalance(self, coin):
         ws_client = self.getGateWsClient()
         return ws_client.gateRequest(random.randint(0, 99999), 'balance.query', [coin.upper()])
