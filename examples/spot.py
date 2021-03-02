@@ -14,25 +14,15 @@ import random
 
 
 class GateioConfig():
-    _instance_lock = threading.Lock()
+    # _instance_lock = threading.Lock()
     configLoaded = False
     config_dict = {}
-
-    def __init__(self):
-        pass
-
-    def __new__(cls, *args, **kwargs):
-        if not hasattr(GateioConfig, "_instance"):
-            with GateioConfig._instance_lock:
-                if not hasattr(GateioConfig, "_instance"):
-                    GateioConfig._instance = object.__new__(cls)
-        return GateioConfig._instance
 
     @property
     def getConfig(self):
         if not GateioConfig.configLoaded:
-            with GateioConfig._instance_lock:
-                self.loadConfig()
+            # with GateioConfig._instance_lock:
+            self.loadConfig()
         return GateioConfig.config_dict
 
     def loadConfig(self):
@@ -48,18 +38,17 @@ class GateioConfig():
 
 class GateWSClient():
     gate_ws_client = None
-    _instance_lock = threading.Lock()
+    # _instance_lock = threading.Lock()
 
     def getGateWsClient(self):
-        with GateioConfig._instance_lock:
-            if GateWSClient.gate_ws_client is None:
-                gateio_config = GateioConfig()
+        if GateWSClient.gate_ws_client is None:
+            gateio_config = GateioConfig()
 
-                api_key = gateio_config.getConfig['api_key']
-                api_secret = gateio_config.getConfig['api_secret']
-                host_used = gateio_config.getConfig['host_used']
+            api_key = gateio_config.getConfig['api_key']
+            api_secret = gateio_config.getConfig['api_secret']
+            host_used = gateio_config.getConfig['host_used']
 
-                GateWSClient.gate_ws_client = GateWs("wss://ws.gate.io/v4/", api_key, api_secret)
+            GateWSClient.gate_ws_client = GateWs("wss://ws.gate.io/v4/", api_key, api_secret)
         return GateWSClient.gate_ws_client
 
     def getBalance(self, coin):
