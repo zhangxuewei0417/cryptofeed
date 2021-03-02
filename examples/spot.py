@@ -57,6 +57,14 @@ class GateWSClient():
         coin = coin.upper()
         return ws_client.gateRequest(random.randint(0, 99999), 'balance.query', [coin])
 
+    def getBalanceSimple(self,coin):
+        balance = None
+        coin = coin.upper()
+        res = self.getBalance(coin)
+        if 'result' in res:
+            balance = res['result'][coin]['available']
+        return balance
+
     def trade(self):
         gate = GateWs("wss://ws.gate.io/v4/", self.api_key, self.api_secret)
         ##Check server connectivity.
@@ -192,13 +200,13 @@ class GateAPIClient():
 # client.trade('BTC_USDT')
 
 ws_client = GateWSClient()
-res = ws_client.getBalance('usdt')
+res = ws_client.getBalanceSimple('usdt')
 print(res)
-res = ws_client.getBalance('link')
+res = ws_client.getBalanceSimple('link')
 print(res)
-res = ws_client.getBalance('fil')
+res = ws_client.getBalanceSimple('fil')
 print(res)
-res = ws_client.getBalance('dot')
-print(res['result'])
+res = ws_client.getBalanceSimple('dot')
+print(res)
 
 
