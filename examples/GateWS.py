@@ -65,8 +65,8 @@ class GateWs:
                 GateWs.ws.send(js)
             except WebSocketTimeoutException:
                 self.gateSign()
-            finally:
                 GateWs.ws.send(js)
+            finally:
                 return GateWs.ws.recv()
 
 ####https://www.gateio.io/####
