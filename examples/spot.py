@@ -191,4 +191,6 @@ class GateAPIClient():
 # client.trade('BTC_USDT')
 
 ws_client = GateWSClient()
-print(ws_client.getBalance('usdt'))
+res = ws_client.getBalance('usdt')
+print(len(res))
+print(res)
