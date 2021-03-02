@@ -10,6 +10,7 @@ import yaml
 import os
 from GateWS import GateWs
 import random
+import json
 # logger = logging.getLogger(__name__)
 
 
@@ -192,8 +193,13 @@ class GateAPIClient():
 
 ws_client = GateWSClient()
 res = ws_client.getBalance('usdt')
+print(res)
 res = ws_client.getBalance('link')
+print(res)
 res = ws_client.getBalance('fil')
+print()
 res = ws_client.getBalance('dot')
+res_json = json.dumps(res)
+print(res_json['result']['DOT']['available'])
 
 
