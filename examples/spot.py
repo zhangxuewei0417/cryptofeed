@@ -192,5 +192,8 @@ class GateAPIClient():
 
 ws_client = GateWSClient()
 res = ws_client.getBalance('usdt')
-print(len(res))
-print(res)
+res = ws_client.getBalance('link')
+res = ws_client.getBalance('fil')
+res = ws_client.getBalance('dot')
+
+
