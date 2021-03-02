@@ -70,6 +70,11 @@ class GateWSClient():
         ws_client = self.getGateWsClient()
         return ws_client.gateRequest(random.randint(0, 99999), 'ticker.query', [pair, 86400])
 
+    def getUnexecutedOrder(self, pair):
+        pair = pair.upper()
+        ws_client = self.getGateWsClient()
+        return ws_client.gateRequest(random.randint(0, 99999), 'order.query', [pair, 0, 10])
+
     def trade(self):
         gate = GateWs("wss://ws.gate.io/v4/", self.api_key, self.api_secret)
         ##Check server connectivity.
@@ -211,5 +216,5 @@ print(res)
 res = ws_client.getBalanceSimple('dot')
 print(res)
 
-print(ws_client.getTicker('btc_usdt'))
+print(ws_client.getUnexecutedOrder('btc_usdt'))
 
