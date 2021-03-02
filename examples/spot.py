@@ -197,9 +197,10 @@ print(res)
 res = ws_client.getBalance('link')
 print(res)
 res = ws_client.getBalance('fil')
-print()
+print(res)
 res = ws_client.getBalance('dot')
 res_json = json.dumps(res)
-print(res_json['result']['DOT']['available'])
+print(res_json)
+print(res_json[0]['result']['DOT']['available'])
 
 
