@@ -199,8 +199,6 @@ print(res)
 res = ws_client.getBalance('fil')
 print(res)
 res = ws_client.getBalance('dot')
-res_json = json.loads(res)
-print(res_json)
-print(res_json[0]['result']['DOT']['available'])
+print(res['result'])
 
 

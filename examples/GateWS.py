@@ -67,6 +67,6 @@ class GateWs:
                 self.gateSign()
                 GateWs.ws.send(js)
             finally:
-                return GateWs.ws.recv()
+                return json.loads(GateWs.ws.recv())
 
 ####https://www.gateio.io/####
