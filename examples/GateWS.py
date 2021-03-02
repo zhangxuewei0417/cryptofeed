@@ -46,7 +46,7 @@ class GateWs:
         js = json.dumps(data)
         GateWs.ws.send(js)
         GateWs.server_signed = True
-        return print(GateWs.ws.recv())
+        return print(f'signin {GateWs.ws.recv()}')
 
     def gateRequest(self, id, method, params):
 
