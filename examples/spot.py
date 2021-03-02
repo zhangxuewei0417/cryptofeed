@@ -47,12 +47,26 @@ class GateioConfig():
 
 
 class GateWSClient():
-    def __init__(self):
-        gateio_obj = GateioConfig()
+    gate_ws_client = None
+    _instance_lock = threading.Lock()
 
-        self.api_key = gateio_obj.getConfig['api_key']
-        self.api_secret = gateio_obj.getConfig['api_secret']
-        self.host_used = gateio_obj.getConfig['host_used']
+    def getGateWsClient(self):
+        with GateioConfig._instance_lock:
+            if GateWSClient.gate_ws_client is None:
+                gateio_config = GateioConfig()
+
+                api_key = gateio_config.getConfig['api_key']
+                api_secret = gateio_config.getConfig['api_secret']
+                host_used = gateio_config.getConfig['host_used']
+
+                GateWSClient.gate_ws_client = GateWs("wss://ws.gate.io/v4/", api_key, api_secret)
+        return GateWSClient.gate_ws_client
+
+    def __init__(self):
+
+    def getBalance(self, coin):
+        ws_client = self.getGateWsClient()
+        return ws_client.gateRequest(random.randint(0, 99999), 'balance.query', [coin.upper()])
 
     def trade(self):
         gate = GateWs("wss://ws.gate.io/v4/", self.api_key, self.api_secret)
@@ -188,8 +202,5 @@ class GateAPIClient():
 # client = GateAPIClient()
 # client.trade('BTC_USDT')
 
-wsclient = GateWSClient()
-wsclient.trade()
-
-wsclient = GateWSClient()
-wsclient.trade()
+ws_client = GateWSClient()
+print(ws_client.getBalance('usdt'))
