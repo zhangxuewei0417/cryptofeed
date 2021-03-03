@@ -87,7 +87,7 @@ class GateWSClient():
     # return 0 if there is no open order, otherwise return order id
     def hasUnexecutedOrder(self, pair):
         pair = pair.upper()
-        res = ws_client.gateRequest(random.randint(0, 99999), 'order.query', [pair, 0, 10])
+        res = self.getUnexecutedOrder(pair)
         records = res['result']['records']
         if len(records) == 0:
             return 0
