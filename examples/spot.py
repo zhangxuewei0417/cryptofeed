@@ -83,17 +83,17 @@ class GateWSClient():
     def getDepth(self, pair):
         pair = pair.upper()
         ws_client = self.getGateWsClient()
-        return ws_client.gateRequest(random.randint(0, 99999), 'spot.book_ticker', [pair, 10, 0.0001])
+        return ws_client.gateRequest(random.randint(0, 99999), 'depth.query', [pair, 10, "0.0001"])
 
     def getHighestBuyPrice(self, pair):
         pair = pair.upper()
         res = self.getDepth(pair)
-        return res['bids'][0]
+        return res['result']['bids'][0]
 
     def getLowestSellPrice(self, pair):
         pair = pair.upper()
         res = self.getDepth(pair)
-        return res['asks'][0]
+        return res['result']['asks'][0]
 
     def trade(self):
         gate = GateWs("wss://ws.gate.io/v4/", self.api_key, self.api_secret)
@@ -227,15 +227,8 @@ class GateAPIClient():
 # client.trade('BTC_USDT')
 
 ws_client = GateWSClient()
-res = ws_client.getBalanceSimple('usdt')
-print(res)
-res = ws_client.getBalanceSimple('link')
-print(res)
-res = ws_client.getBalanceSimple('fil')
-print(res)
-res = ws_client.getBalanceSimple('dot')
-print(res)
 
-print(ws_client.getHighestBuyPrice('btc_usdt'))
-print(ws_client.getLowestSellPrice('btc_usdt'))
+print(ws_client.getDepth('zks_usdt'))
+print(ws_client.getLowestSellPrice('zks_usdt'))
+print(ws_client.getHighestBuyPrice('zks_usdt'))
 
