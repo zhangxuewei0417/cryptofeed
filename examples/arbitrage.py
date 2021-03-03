@@ -1,7 +1,10 @@
+import time
 from decimal import Decimal as D
 from decimal import getcontext
 from cryptofeed.defines import BID, ASK
 import gate_api
+
+from examples.spot import GateAPIClient, GateWSClient
 
 
 class Arbitrage:
@@ -10,7 +13,6 @@ class Arbitrage:
     ETH = 'ETH'
     feed = ''
     fee = D('0.02')
-
 
     def __init__(self):
         pass
@@ -90,16 +92,17 @@ class Arbitrage:
     def simulateOrdering(self, g, initial_invest_amount, invest_coin, coin, intermediate_coin, invest_increase):
         if g.has_edge(coin, intermediate_coin) and g.has_edge(coin, invest_coin):
 
-            invest2coin_amount = D(g.get_edge_data(invest_coin, coin)['vol_count']) # 245 SWAP
-            invest2coin_rate = D(g.get_edge_data(invest_coin, coin)['rate'])    # 4.09 USDT
+            invest2coin_amount = D(g.get_edge_data(invest_coin, coin)['vol_count'])  # 245 SWAP
+            invest2coin_rate = D(g.get_edge_data(invest_coin, coin)['rate'])  # 4.09 USDT
 
-            coin2intermediate_amount = D(g.get_edge_data(coin, intermediate_coin)['vol_count']) # 52 SWAP
-            coin2intermediate_rate = D(g.get_edge_data(coin, intermediate_coin)['rate'])        # 0.0026 ETH
+            coin2intermediate_amount = D(g.get_edge_data(coin, intermediate_coin)['vol_count'])  # 52 SWAP
+            coin2intermediate_rate = D(g.get_edge_data(coin, intermediate_coin)['rate'])  # 0.0026 ETH
 
-            intermediate2invest_amount = D(g.get_edge_data(intermediate_coin, invest_coin)['vol_count'])      # 0.5 ETH
-            intermediate2invest_rate = D(g.get_edge_data(intermediate_coin, invest_coin)['rate'])               #1498 USD
+            intermediate2invest_amount = D(g.get_edge_data(intermediate_coin, invest_coin)['vol_count'])  # 0.5 ETH
+            intermediate2invest_rate = D(g.get_edge_data(intermediate_coin, invest_coin)['rate'])  # 1498 USD
 
-            invest_amount = min(initial_invest_amount, min(invest2coin_amount, coin2intermediate_amount) / invest2coin_rate)
+            invest_amount = min(initial_invest_amount,
+                                min(invest2coin_amount, coin2intermediate_amount) / invest2coin_rate)
 
             # repeatedly find the smallest amount can invest
             v1 = invest_amount * invest2coin_rate * D(1 - self.fee)
@@ -111,6 +114,48 @@ class Arbitrage:
                 print(
                     f'{self.feed} {invest_amount} {invest_coin}->{v1} {coin}->'
                     f'{v2} {intermediate_coin}-> {v3} {invest_coin}')
+
+                api_client = GateAPIClient()
+                ws_client = GateWSClient()
+                pair1 = coin + '_' + invest_coin
+
+                api_client.buyFast(pair1, v1)
+                while True:
+                    if not ws_client.hasUnexecutedOrder(pair1):
+                        break
+                    time.sleep(0.01)
+
+                pair2 = coin + '_' + intermediate_coin
+                api_client.sellFast(pair2, v1)
+                while True:
+                    if not ws_client.hasUnexecutedOrder(pair2):
+                        break
+                    time.sleep(0.01)
+
+                pair3 = None
+                if intermediate_coin.lower() == 'eth' and invest_coin:
+                    pair3 = self.formPair(intermediate_coin, invest_coin)
+                balance = ws_client.getBalanceSimple(intermediate_coin)
+                api_client.sellFast(pair3, balance)
+                while True:
+                    if not ws_client.hasUnexecutedOrder(pair3):
+                        break
+                    time.sleep(0.01)
+
+
+
+    def formPair(self, coin1, coin2):
+        if coin1.lower() == 'eth':
+            return coin1 + '_' + coin2
+        elif coin1.lower() == 'btc' and coin2.lower() == 'usdt':
+            return coin1 + '_' + coin2
+        elif coin1.lower() == 'btc' and coin2.lower() == 'eth':
+            return coin2 + '_' + coin1
+        elif coin1.lower() == 'usdt' and coin2.lower() == 'btc':
+            return coin2 + '_' + coin1
+        elif coin1.lower() == 'usdt' and coin2.lower() == 'eth':
+            return coin2 + '_' + coin1
+
 
     def potentialArbitrage(self, g, symbol):
 

@@ -13,6 +13,7 @@ import random
 import json
 import time
 
+
 # logger = logging.getLogger(__name__)
 
 
@@ -107,7 +108,7 @@ class GateWSClient():
     def getDepth(self, pair):
         pair = pair.upper()
         ws_client = self.getGateWsClient()
-        return ws_client.gateRequest(random.randint(0, 99999), 'depth.query', [pair, 10, "0.0001"])
+        return ws_client.gateRequest(random.randint(0, 99999), 'depth.query', [pair, 10, "0.00000000001"])
 
     def getHighestBuyPrice(self, pair):
         pair = pair.upper()
@@ -118,79 +119,6 @@ class GateWSClient():
         pair = pair.upper()
         res = self.getDepth(pair)
         return res['result']['asks'][0][0]
-
-    def trade(self):
-        gate = GateWs("wss://ws.gate.io/v4/", self.api_key, self.api_secret)
-        ##Check server connectivity.
-        # print(gate.gateRequest(random.randint(0,99999),'server.ping',[]))
-
-        ##Acquire server time.
-        # print(gate.gateRequest(random.randint(0,99999),'server.time',[]))
-
-        ##Query ticker of specified market, including price, deal volume etc in certain period.
-        # print(gate.gateRequest(random.randint(0,99999),'ticker.query',["EOS_USDT",86400]))
-
-        ##Subscribe market ticker.
-        # print(gate.gateRequest(random.randint(0,99999),'ticker.subscribe',["BOT_USDT"]))
-
-        ##Unsubscribe market ticker.
-        # print(gate.gateRequest(random.randint(0,99999),'ticker.unsubscribe',[]))
-
-        ##Query latest trades information, including time, price, amount, type and so on.
-        # print(gate.gateRequest(random.randint(0,99999),'trade.query',["EOS_USDT",2,7177813]))
-
-        ##Subscribe trades update notification.
-        # print(gate.gateRequest(random.randint(0,99999),'trades.subscribe',["ETH_USDT","BTC_USDT"]))
-
-        ##Unsubscribe trades update notification.
-        # print(gate.gateRequest(random.randint(0,99999),'trades.unsubscribe',[]))
-
-        ##Query specified market depth.
-        # print(gate.gateRequest(random.randint(0,99999),'depth.query',["EOS_USDT",5,"0.0001"]))
-
-        ##Subscribe depth.
-        # print(gate.gateRequest(random.randint(0,99999),'depth.subscribe',["ETH_USDT",5,"0.0001"]))
-
-        ##Unsbscribe specified market depth.
-        # print(gate.gateRequest(random.randint(0,99999),'depth.unsubscribe',[]))
-
-        ##Query specified market kline information
-        # print(gate.gateRequest(random.randint(0,99999),'kline.query',["BTC_USDT",1,1516951219,1800]))
-
-        ##Subscribe specified market kline information.
-        # print(gate.gateRequest(random.randint(0,99999),'kline.subscribe',["BTC_USDT",1800]))
-
-        ##Unsubsribe specified market kline information.
-        # print(gate.gateRequest(random.randint(0,99999),'kline.unsubscribe',[]))
-
-        ##Notify kline information of subscribed market.
-        # print(gate.gateRequest(random.randint(0,99999),'kline.update',[1492358400,"7000.00","8000.0","8100.00","6800.00","1000.00","123456.00","BTC_USDT"]))
-
-        ##Signature based authorization.
-        # print(gate.gateSign(random.randint(0,99999),'server.sign',[]))
-
-        ##Query user unexecuted orders
-        # print(gate.gateRequest(random.randint(0,99999),'order.query',["BTC_USDT",0,10]))
-
-        ##Subscribe user orders update
-        # print(gate.gateRequest(random.randint(0,99999),'order.subscribe',["BTC_USDT"]))
-
-        ##Notify user orders information when an order is put, updated or finished.
-        # print(gate.gateRequest(random.randint(0,99999),'order.update',[2,"12345654654"]))
-
-        ##Unubscribe user orders update notification, for all markets.
-        # print(gate.gateRequest(random.randint(0,99999),'order.unsubscribe',[]))
-
-        ##Acquire user balance information of specified asset or assets.
-
-        ##Subscribe for user balance update.
-        # print(gate.gateRequest(random.randint(0,99999),'balance.subscribe',["BTC"]))
-
-        ##Notify user balance update.
-        # print(gate.gateRequest(random.randint(0,99999),'balance.update',[{'EOS':{'available':'96.765323611874','freeze':'11'}}]))
-
-        ##Unsubscribe user balance update.
-        ##print(gate.gateRequest(random.randint(0,99999),'balance.unsubscribe',[]))
 
 
 class GateAPIClient():
@@ -231,56 +159,20 @@ class GateAPIClient():
         return self.sell(pair, order_amount, price)
 
     def trade(self, pair, order_amount, last_price, side):
-        # type: (RunConfig) -> None
-        # currency_pair = "BTC_USDT"
-        # currency = pair.split("_")[1]
 
         spot_api = self.getAPIClient()
 
-        # pair = spot_api.get_currency_pair(currency_pair)
-        # logger.info("testing against currency pair: " + currency_pair)
-        # min_amount = pair.min_quote_amount
-
-        # get last price
-        # tickers = spot_api.list_tickers(currency_pair=currency_pair)
-        # assert len(tickers) == 1
-        # last_price = tickers[0].last
-
-        # make sure balance is enough
-        # order_amount = D(min_amount) * 2
-        # accounts = spot_api.list_spot_accounts(currency=currency)
-        # assert len(accounts) == 1
-        # available = D(accounts[0].available)
-        # # logger.info("Account available: %s %s", str(available), currency)
-        # print(f'Account available: {str(available)} {currency}')
-        # if available < order_amount:
-        #     #logger.error("Account balance not enough")
-        #     print(f'Account balance not enough')
-        #     return
-
         order = Order(amount=str(order_amount), price=last_price, side=side, currency_pair=pair)
-        print("place a spot %s order in %s with amount %s and price %s", order.side, order.currency_pair,
-              order.amount, order.price)
+        print(f'place a spot {order.side} order in {order.currency_pair} with amount {order.amount} and price {order.price}')
         created = None
         # created = spot_api.create_order(order)
-        # print("order created with id %s, status %s", created.id, created.status)
+        # print(f'order created with id {created.id}, status {created.status}')
         return created
-        # if created.status == 'open':
-        #     order_result = spot_api.get_order(created.id, currency_pair)
-        #     print("order %s filled %s, left: %s", order_result.id, order_result.filled_total, order_result.left)
-        #     result = spot_api.cancel_order(order_result.id, currency_pair)
-        #     if result.status == 'cancelled':
-        #         print("order %s cancelled", result.id)
-        # else:
-        #     trades = spot_api.list_my_trades(currency_pair, order_id=created.id)
-        #     assert len(trades) > 0
-        #     for t in trades:
-        #         print("order %s filled %s with price %s", t.order_id, t.amount, t.price)
 
 
-# api_client = GateAPIClient()
+api_client = GateAPIClient()
 # ws_client = GateWSClient()
-# api_client.buyFast('eth_usdt', '0.001')
+api_client.buyFast('skm_usdt', '0.001')
 # while True:
 #     if not ws_client.hasUnexecutedOrder('eth_usdt'):
 #         break

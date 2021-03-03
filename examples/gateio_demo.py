@@ -33,7 +33,6 @@ g_dict['GATEIO'] = g
 g_huobi = nx.DiGraph()
 g_dict['HUOBI'] = g_huobi
 
-
 async def book(feed, symbol, book, timestamp, receipt_timestamp):
     # print(f'Timestamp: {timestamp} Cryptofeed Receipt: {receipt_timestamp} Feed: {feed} Pair: {symbol} Book Bid is {book[BID]} Ask  is {book[ASK]}')
     # print(f'bid is {next(iter(reversed(book[BID].items())))} ask is {next(iter(book[ASK].items()))}')
