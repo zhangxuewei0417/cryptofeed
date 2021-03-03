@@ -70,10 +70,31 @@ class GateWSClient():
         ws_client = self.getGateWsClient()
         return ws_client.gateRequest(random.randint(0, 99999), 'ticker.query', [pair, 86400])
 
+    # {'error': None, 'result': {'limit': 10, 'offset': 0, 'total': 1, 'records': [
+    #     {'id': 33989855664, 'market': 'ETH_USDT', 'tif': 1, 'user': 3209033, 'ctime': 1614758938.861532,
+    #      'mtime': 1614758938.861532, 'price': '1568.25', 'amount': '0.01', 'iceberg': '0', 'left': '0.01',
+    #      'deal_fee_rebate': '0', 'deal_point_fee': '0', 'gt_discount': '2', 'gt_taker_fee': '0', 'gt_maker_fee': '0',
+    #      'deal_gt_fee': '0', 'orderType': 1, 'type': 2, 'dealFee': '0', 'filledAmount': '0', 'filledTotal': '0'}]},
+    #  'id': 75791}
+
+    # {'error': None, 'result': {'limit': 10, 'offset': 0, 'total': 0, 'records': []}, 'id': 49457}
+
     def getUnexecutedOrder(self, pair):
         pair = pair.upper()
         ws_client = self.getGateWsClient()
         return ws_client.gateRequest(random.randint(0, 99999), 'order.query', [pair, 0, 10])
+
+    # return 0 if there is no open order, otherwise return order id
+    def hasUnexecutedOrder(self, pair):
+        pair = pair.upper()
+        res = ws_client.gateRequest(random.randint(0, 99999), 'order.query', [pair, 0, 10])
+        records = res['result']['records']
+        if len(records) == 0:
+            return 0
+        else:
+            order = records[0]
+            print(f'price: {order["price"]} amount: {order["amount"]}')
+            return order['id']
 
     def getOrderBook(self, pair):
         pair = pair.upper()
@@ -232,4 +253,5 @@ print(ws_client.getDepth('zks_usdt'))
 print(ws_client.getLowestSellPrice('zks_usdt'))
 print(ws_client.getHighestBuyPrice('zks_usdt'))
 print(ws_client.getUnexecutedOrder('eth_usdt'))
+print(ws_client.hasUnexecutedOrder('eth_usdt'))
 
