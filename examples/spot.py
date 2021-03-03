@@ -261,9 +261,9 @@ class GateAPIClient():
         order = Order(amount=str(order_amount), price=last_price, side=side, currency_pair=pair)
         print("place a spot %s order in %s with amount %s and price %s", order.side, order.currency_pair,
               order.amount, order.price)
-        created = None
-        # created = spot_api.create_order(order)
-        # print("order created with id %s, status %s", created.id, created.status)
+        # created = None
+        created = spot_api.create_order(order)
+        print("order created with id %s, status %s", created.id, created.status)
         return created
         # if created.status == 'open':
         #     order_result = spot_api.get_order(created.id, currency_pair)
