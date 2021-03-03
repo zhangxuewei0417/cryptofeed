@@ -24,7 +24,7 @@ from cryptofeed.exchanges import (FTX, Binance, BinanceFutures, Bitfinex, Bitfly
 # Handlers can be normal methods/functions or async. The feedhandler is paused
 # while the callbacks are being handled (unless they in turn await other functions or I/O)
 # so they should be as lightweight as possible
-from examples.arbitrage import Arbitrage
+from arbitrage import Arbitrage
 import time
 
 g_dict = {}

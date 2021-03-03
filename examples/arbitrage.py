@@ -4,7 +4,7 @@ from decimal import getcontext
 from cryptofeed.defines import BID, ASK
 import gate_api
 
-from examples.spot import GateAPIClient, GateWSClient
+from spot import GateAPIClient, GateWSClient
 
 
 class Arbitrage:

@@ -170,9 +170,9 @@ class GateAPIClient():
         return created
 
 
-api_client = GateAPIClient()
+#api_client = GateAPIClient()
 # ws_client = GateWSClient()
-api_client.buyFast('skm_usdt', '0.001')
+#api_client.buyFast('skm_usdt', '0.001')
 # while True:
 #     if not ws_client.hasUnexecutedOrder('eth_usdt'):
 #         break
