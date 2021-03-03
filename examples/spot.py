@@ -231,4 +231,5 @@ ws_client = GateWSClient()
 print(ws_client.getDepth('zks_usdt'))
 print(ws_client.getLowestSellPrice('zks_usdt'))
 print(ws_client.getHighestBuyPrice('zks_usdt'))
+print(ws_client.getUnexecutedOrder('zks_usdt'))
 
