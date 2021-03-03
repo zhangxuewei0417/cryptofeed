@@ -11,6 +11,8 @@ import os
 from GateWS import GateWs
 import random
 import json
+import time
+
 # logger = logging.getLogger(__name__)
 
 
@@ -32,13 +34,14 @@ class GateioConfig():
 
         gateio_config = yaml.load(f)
         GateioConfig.config_dict = {'api_key': gateio_config['api_key'],
-                       'api_secret': gateio_config['api_secret'],
-                       'host_used': gateio_config['host_used']}
+                                    'api_secret': gateio_config['api_secret'],
+                                    'host_used': gateio_config['host_used']}
         GateioConfig.configLoaded = True
 
 
 class GateWSClient():
     gate_ws_client = None
+
     # _instance_lock = threading.Lock()
 
     def getGateWsClient(self):
@@ -57,7 +60,7 @@ class GateWSClient():
         coin = coin.upper()
         return ws_client.gateRequest(random.randint(0, 99999), 'balance.query', [coin])
 
-    def getBalanceSimple(self,coin):
+    def getBalanceSimple(self, coin):
         balance = None
         coin = coin.upper()
         res = self.getBalance(coin)
@@ -109,12 +112,12 @@ class GateWSClient():
     def getHighestBuyPrice(self, pair):
         pair = pair.upper()
         res = self.getDepth(pair)
-        return res['result']['bids'][0]
+        return res['result']['bids'][0][0]
 
     def getLowestSellPrice(self, pair):
         pair = pair.upper()
         res = self.getDepth(pair)
-        return res['result']['asks'][0]
+        return res['result']['asks'][0][0]
 
     def trade(self):
         gate = GateWs("wss://ws.gate.io/v4/", self.api_key, self.api_secret)
@@ -189,69 +192,111 @@ class GateWSClient():
         ##Unsubscribe user balance update.
         ##print(gate.gateRequest(random.randint(0,99999),'balance.unsubscribe',[]))
 
+
 class GateAPIClient():
-    def __init__(self):
-        gateio_obj = GateioConfig()
+    gate_api_client = None
 
-        self.api_key = gateio_obj.getConfig['api_key']
-        self.api_secret = gateio_obj.getConfig['api_secret']
-        self.host_used = gateio_obj.getConfig['host_used']
+    def getAPIClient(self):
+        if GateAPIClient.gate_api_client is None:
+            gateio_obj = GateioConfig()
 
-    def trade(self, currency_pair):
+            api_key = gateio_obj.getConfig['api_key']
+            api_secret = gateio_obj.getConfig['api_secret']
+            host_used = gateio_obj.getConfig['host_used']
+
+            # Initialize API client
+            # Setting host is optional. It defaults to https://api.gateio.ws/api/v4
+            config = Configuration(key=api_key, secret=api_secret, host=host_used)
+            GateAPIClient.gate_api_client = SpotApi(ApiClient(config))
+        return GateAPIClient.gate_api_client
+
+    def buy(self, pair, order_amount, last_price):
+        return self.trade(pair, order_amount, last_price, 'buy')
+
+    # buy using the lowest ask price
+    def buyFast(self, pair, order_amount):
+        pair = pair.upper()
+        ws = GateWSClient()
+        price = ws.getLowestSellPrice(pair)
+        return self.buy(pair, order_amount, price)
+
+    def sell(self, pair, order_amount, last_price):
+        return self.trade(pair, order_amount, last_price, 'sell')
+
+    # sell to the highest bid price
+    def sellFast(self, pair, order_amount):
+        pair = pair.upper()
+        ws = GateWSClient()
+        price = ws.getHighestBuyPrice(pair)
+        return self.sell(pair, order_amount, price)
+
+    def trade(self, pair, order_amount, last_price, side):
         # type: (RunConfig) -> None
         # currency_pair = "BTC_USDT"
-        currency = currency_pair.split("_")[1]
+        # currency = pair.split("_")[1]
 
-        # Initialize API client
-        # Setting host is optional. It defaults to https://api.gateio.ws/api/v4
-        config = Configuration(key=self.api_key, secret=self.api_secret, host=self.host_used)
-        spot_api = SpotApi(ApiClient(config))
-        pair = spot_api.get_currency_pair(currency_pair)
+        spot_api = self.getAPIClient()
+
+        # pair = spot_api.get_currency_pair(currency_pair)
         # logger.info("testing against currency pair: " + currency_pair)
-        min_amount = pair.min_quote_amount
+        # min_amount = pair.min_quote_amount
 
         # get last price
-        tickers = spot_api.list_tickers(currency_pair=currency_pair)
-        assert len(tickers) == 1
-        last_price = tickers[0].last
+        # tickers = spot_api.list_tickers(currency_pair=currency_pair)
+        # assert len(tickers) == 1
+        # last_price = tickers[0].last
 
         # make sure balance is enough
-        order_amount = D(min_amount) * 2
-        accounts = spot_api.list_spot_accounts(currency=currency)
-        assert len(accounts) == 1
-        available = D(accounts[0].available)
-        # logger.info("Account available: %s %s", str(available), currency)
-        print(f'Account available: {str(available)} {currency}')
-        if available < order_amount:
-            #logger.error("Account balance not enough")
-            print(f'Account balance not enough')
-            return
-    """
-        order = Order(amount=str(order_amount), price=last_price, side='buy', currency_pair=currency_pair)
-        logger.info("place a spot %s order in %s with amount %s and price %s", order.side, order.currency_pair,
-                    order.amount, order.price)
-        created = spot_api.create_order(order)
-        logger.info("order created with id %s, status %s", created.id, created.status)
-        if created.status == 'open':
-            order_result = spot_api.get_order(created.id, currency_pair)
-            logger.info("order %s filled %s, left: %s", order_result.id, order_result.filled_total, order_result.left)
-            result = spot_api.cancel_order(order_result.id, currency_pair)
-            if result.status == 'cancelled':
-                logger.info("order %s cancelled", result.id)
-        else:
-            trades = spot_api.list_my_trades(currency_pair, order_id=created.id)
-            assert len(trades) > 0
-            for t in trades:
-                logger.info("order %s filled %s with price %s", t.order_id, t.amount, t.price)"""
+        # order_amount = D(min_amount) * 2
+        # accounts = spot_api.list_spot_accounts(currency=currency)
+        # assert len(accounts) == 1
+        # available = D(accounts[0].available)
+        # # logger.info("Account available: %s %s", str(available), currency)
+        # print(f'Account available: {str(available)} {currency}')
+        # if available < order_amount:
+        #     #logger.error("Account balance not enough")
+        #     print(f'Account balance not enough')
+        #     return
 
-# client = GateAPIClient()
+        order = Order(amount=str(order_amount), price=last_price, side=side, currency_pair=pair)
+        print("place a spot %s order in %s with amount %s and price %s", order.side, order.currency_pair,
+              order.amount, order.price)
+        created = None
+        # created = spot_api.create_order(order)
+        # print("order created with id %s, status %s", created.id, created.status)
+        return created
+        # if created.status == 'open':
+        #     order_result = spot_api.get_order(created.id, currency_pair)
+        #     print("order %s filled %s, left: %s", order_result.id, order_result.filled_total, order_result.left)
+        #     result = spot_api.cancel_order(order_result.id, currency_pair)
+        #     if result.status == 'cancelled':
+        #         print("order %s cancelled", result.id)
+        # else:
+        #     trades = spot_api.list_my_trades(currency_pair, order_id=created.id)
+        #     assert len(trades) > 0
+        #     for t in trades:
+        #         print("order %s filled %s with price %s", t.order_id, t.amount, t.price)
+
+
+api_client = GateAPIClient()
+ws_client = GateWSClient()
+api_client.buyFast('eth_usdt', '0.001')
+while True:
+    if not ws_client.hasUnexecutedOrder('eth_usdt'):
+        break
+    time.sleep(0.01)
+
+api_client.sellFast('eth_usdt', '0.001')
+while True:
+    if not ws_client.hasUnexecutedOrder('eth_usdt'):
+        break
+    time.sleep(0.01)
 # client.trade('BTC_USDT')
 
-ws_client = GateWSClient()
-
-print(ws_client.getDepth('zks_usdt'))
-print(ws_client.getLowestSellPrice('zks_usdt'))
-print(ws_client.getHighestBuyPrice('zks_usdt'))
-print(ws_client.getUnexecutedOrder('eth_usdt'))
-print(ws_client.hasUnexecutedOrder('eth_usdt'))
-
+# ws_client = GateWSClient()
+#
+# print(ws_client.getDepth('zks_usdt'))
+# print(ws_client.getLowestSellPrice('zks_usdt'))
+# print(ws_client.getHighestBuyPrice('zks_usdt'))
+# print(ws_client.getUnexecutedOrder('eth_usdt'))
+# print(ws_client.hasUnexecutedOrder('eth_usdt'))
