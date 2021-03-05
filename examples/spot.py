@@ -186,8 +186,11 @@ class GateAPIClient():
 # client.trade('BTC_USDT')
 
 # ws_client = GateWSClient()
-#
+# #
 # print(ws_client.getDepth('zks_usdt'))
+# for i in range(1, 60):
+#     time.sleep(i)
+#     print(ws_client.getDepth('zks_usdt'))
 # print(ws_client.getLowestSellPrice('zks_usdt'))
 # print(ws_client.getHighestBuyPrice('zks_usdt'))
 # print(ws_client.getUnexecutedOrder('eth_usdt'))

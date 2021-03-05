@@ -2,6 +2,7 @@
 # author: か壞尐孩キ
 import random
 
+import websocket
 from websocket import create_connection
 from websocket import WebSocketTimeoutException
 import gzip
@@ -27,19 +28,21 @@ class GateWs:
         self.__apiKey = apiKey
         self.__secretKey = secretKey
 
-    def gateGet(self, id, method, params):
-        if (params == None):
-            params = []
-        ws = create_connection(self.__url)
-        data = {'id': id, 'method': method, 'params': params}
-        js = json.dumps(data)
-        ws.send(js)
-        return ws.recv()
+    # def gateGet(self, id, method, params):
+    #     if (params == None):
+    #         params = []
+    #     ws = create_connection(self.__url)
+    #     data = {'id': id, 'method': method, 'params': params}
+    #     js = json.dumps(data)
+    #     ws.send(js)
+    #     return ws.recv()
 
     def gateSign(self):
 
         if GateWs.ws is None:
-            GateWs.ws = create_connection(self.__url)
+            # GateWs.ws = create_connection(self.__url)
+            GateWs.ws = websocket.WebSocketApp(self.__url)
+            GateWs.ws.run_forever(ping_interval=1, ping_timeout=2)
         nonce = int(time.time() * 1000)
         signature = get_sign(self.__secretKey, str(nonce))
         data = {'id': random.randint(0, 99999), 'method': 'server.sign', 'params': [self.__apiKey, signature, nonce]}
@@ -70,3 +73,4 @@ class GateWs:
                 return json.loads(GateWs.ws.recv())
 
 ####https://www.gateio.io/####
+
